@@ -1,4 +1,6 @@
-#ifdef Flag
+#include <common.h>
+
+#ifdef FLAG
 
 // make some custom characters:
 byte Full[8] = {0b11111, 0b11111, 0b11111, 0b11111, 0b11111, 0b11111, 0b11111, 0b11111};
@@ -369,4 +371,5 @@ void Take_FREE(){
   UDP.write("SFG;N;T");
   UDP.endPacket();
 }
+
 #endif

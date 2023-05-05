@@ -48,8 +48,11 @@ String str;
 Ticker Time_Sec;
 
 ///////////////////////////////////////  Wifi function  ///////////////////////////////////////
+#pragma region "Wifi function"
 
-// connect to wifi – returns true if successful or false if not
+
+/// @brief Connect to WiFi
+/// @return True if successful or false if not
 boolean connectWifi()
 {
     boolean state = true;
@@ -108,7 +111,9 @@ boolean connectWifi()
     return state;
 }
 
-// connect to UDP – returns true if successful or false if not
+
+/// @brief Create UDP server
+/// @return True if successful or False if not
 boolean connectUDP()
 {
     boolean state = false;
@@ -138,7 +143,8 @@ boolean connectUDP()
     return state;
 }
 
-// Try to boot to Unity server
+
+/// @brief Send broadcast to try to connect to server
 void BOTParam()
 {
     comm.start("BOT;");
@@ -182,7 +188,8 @@ void BOTParam()
     comm.sendForced();
 }
 
-// Every seconde, try to reach Unity server
+
+/// @brief Every seconde, try to reach server
 void T_1s()
 {
 
@@ -193,7 +200,8 @@ void T_1s()
     }
 }
 
-// Get current wifi level
+
+/// @brief Get current wifi level
 void WifiLevel()
 {
 
@@ -211,6 +219,40 @@ void WifiLevel()
     comm.send();
 }
 
+#pragma endregion
+
+
+
+///////////////////////////////////////  Wifi function  ///////////////////////////////////////
+#pragma region "Wifi function"
+
+
+// Reset all proprety of module
+void ResetModule()
+{
+
+  // Reset party ID
+  Party = 'n';
+  PopUp = false;
+  
+  // Reset timer of respawn
+  ResetBaseTime();
+
+  // Reset timer of bomb
+  ResetBomb();
+
+
+  #ifdef BTN_R
+  SetLed('R', '0');
+  #endif
+
+  #ifdef BTN_B
+  SetLed('B', '0');
+  #endif
+}
+
+
+#pragma endregion
 
 ////////////////////////////////////////   SETUP   ////////////////////////////////////////
 void setup()
@@ -237,6 +279,7 @@ void setup()
     // Put module in reset state
     ResetModule();
 }
+
 
 /////////////////////////////////////////   LOOP   ////////////////////////////////////////
 

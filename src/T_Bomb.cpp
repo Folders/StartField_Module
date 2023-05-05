@@ -1,3 +1,5 @@
+#include <common.h>
+
 #ifdef Bomb
 
 // make some custom characters:

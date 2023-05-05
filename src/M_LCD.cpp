@@ -1,3 +1,5 @@
+#include <common.h>
+
 #ifdef LCD
 
 // These #defines make it easy to set the backlight color

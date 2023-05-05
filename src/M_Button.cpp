@@ -1,3 +1,4 @@
+#include <common.h>
 
 // Définition des boutons
 #ifdef BTN_R 

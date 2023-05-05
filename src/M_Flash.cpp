@@ -1,3 +1,4 @@
+#include <common.h>
 
 void LampFlash(char Color, char Value)
 {

@@ -1,5 +1,6 @@
-#ifdef Buzzer
+#include <common.h>
 
+#ifdef Buzzer
 
 // Timmer
 Ticker BuzzerEnd;

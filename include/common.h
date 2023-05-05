@@ -11,22 +11,35 @@
 #define LOG
 
 
-// Define witch module is used (ONLY ONE)
-#define MODEL
-//#define BREACH
-//#define ELECTRICITY
-//#define ENERGY
-//#define ENGINE
-//#define EXTINGUISHER
-//#define FIRE 
-//#define NAVIGATION
-//#define RADAR
-//#define SHIELD
-//#define TORPEDO
-
+/////////////////////////////////   Define options of module   /////////////////////////////////
 
 // Define module number if more then one is used
-#define NUMBER 3
+#define NUMBER "03"
+#define TERRAIN 'P'
+
+
+/////////////////////////////////   Define options of module   /////////////////////////////////
+
+// LCD is used
+#define LCD
+
+// Button and lamp used (from I2C)
+#define BTN_R
+#define BTN_B
+#define BTN_O
+
+#define LED_R
+#define LED_B
+
+// External materiel used
+#define Flash_R
+#define Flash_B
+#define Buzzer
+
+// Party mode used
+#define FLAG
+#define BOMB
+#define OBJECTIVE
 
 
 

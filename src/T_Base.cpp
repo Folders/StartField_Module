@@ -1,3 +1,5 @@
+#include <common.h>
+
 
 void SetBase(char Id, char Team, char Type, char Spawn){
 

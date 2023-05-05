@@ -1,3 +1,5 @@
+#include <common.h>
+
 // Timmer for blink
 Ticker Time_Blink;
 bool Blink_R = false;
