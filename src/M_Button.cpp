@@ -1,5 +1,7 @@
 #include <common.h>
 
+#ifdef false
+
 // Définition des boutons
 #ifdef BTN_R 
 PA_Bouton red = PA_Bouton(D3);
@@ -85,3 +87,5 @@ void Bouton()
     }
   #endif
 }
+
+#endif

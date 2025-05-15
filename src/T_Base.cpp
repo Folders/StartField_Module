@@ -1,6 +1,8 @@
 #include <common.h>
 
 
+#ifdef BASE
+
 void SetBase(char Id, char Team, char Type, char Spawn){
 
   // Save party Id
@@ -92,3 +94,5 @@ void ResetBaseTime(){
     
     }
   }
+
+  #endif

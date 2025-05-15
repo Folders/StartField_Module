@@ -20,6 +20,7 @@
 
 /////////////////////////////////   Define options of module   /////////////////////////////////
 
+/*
 // LCD is used
 #define LCD
 
@@ -37,11 +38,12 @@
 #define Buzzer
 
 // Party mode used
+#define BASE
 #define FLAG
 #define BOMB
 #define OBJECTIVE
 
-
+*/
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 //                                          Function                                         //

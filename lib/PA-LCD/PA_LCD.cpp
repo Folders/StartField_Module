@@ -461,6 +461,8 @@ bool PA_LCD::read(uint8_t buttonPin) {
         return false;  
       }
       break;
+    default:
+     return false;
   }
  
 }

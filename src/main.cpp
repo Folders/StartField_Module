@@ -10,8 +10,9 @@
 #include <WiFiUDP.h>
 #include <Ticker.h>
 
-// Define all system - The used must me define in common.h
-//#include <Breach.h>
+
+#include "Peripherals/M_LCD.h"
+M_LCD lcd;
 
 
 ////////////////////////
@@ -232,14 +233,14 @@ void ResetModule()
 {
 
   // Reset party ID
-  Party = 'n';
-  PopUp = false;
+  //Party = 'n';
+  //PopUp = false;
   
   // Reset timer of respawn
-  ResetBaseTime();
+  //ResetBaseTime();
 
   // Reset timer of bomb
-  ResetBomb();
+  //ResetBomb();
 
 
   #ifdef BTN_R
@@ -263,6 +264,9 @@ void setup()
     Serial.begin(115200);
 #endif
 
+    lcd.begin();
+
+    lcd.Write_Msg("Test", "Pierre", C_BLUE);
 
     // Wait until wifi is connected
     do
@@ -274,7 +278,7 @@ void setup()
     udpConnected = connectUDP();
 
     // Run timmer to try to connect Unity server
-    Time_Sec.attach(1, T_1s);
+ //   Time_Sec.attach(1, T_1s);
 
     // Put module in reset state
     ResetModule();
@@ -351,6 +355,23 @@ void loop()
                     // Convert code in string
                     str = comm.GetCode();
 
+                    #ifdef LCD
+                    if ( str == "TXT")
+                    {
+                      lcd.Write_Msg(comm.GetParameter(1), comm.GetParameter(2), comm.GetParameter(3)[0]);
+                    }
+                    
+                    if ( str == "POP")
+                    {
+                        lcd.Write_Pop(comm.GetParameter(1), comm.GetParameter(2), comm.GetParameter(3)[0], comm.GetParameterInChar(4));
+                    }
+                    
+                    if ( str == "CLR")
+                    {
+                        lcd.SetColor(comm.GetParameter(1)[0]);
+                    }
+                    #endif
+                    
                     // Server sak for BOT info
                     if (str == "RBT")
                     {
