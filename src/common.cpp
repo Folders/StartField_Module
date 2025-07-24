@@ -23,8 +23,15 @@ int CharToInt(char *p)
 /// @brief Convert chars to float
 /// @param p Text to convert
 /// @return Value in float
-float CharToFloat(char *p)
+float CharToFloat(const char *p)
 {
+     
+
+#ifdef LOG
+        Serial.print("Char to float from : ");
+        Serial.println(p);
+#endif
+
      char *endptr;
      float result = strtof(p, &endptr);
 
@@ -43,7 +50,7 @@ float CharToFloat(char *p)
      return result;
 }
 
-
+/*
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 //                                      Communication                                      //
@@ -377,3 +384,5 @@ void MyComm::Info_Received()
      }
 #endif
 }
+
+*/

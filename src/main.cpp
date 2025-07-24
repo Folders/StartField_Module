@@ -7,8 +7,8 @@
 #elif defined(ESP32)
 #include <WiFi.h>
 #endif
-#include <WiFiUDP.h>
-#include <Ticker.h>
+
+#include "core/MyComm.h"
 
 
 #include "Peripherals/M_LCD.h"
@@ -30,23 +30,6 @@ bool debug = false;
 // Wifi
 #include <secret.h>
 boolean wifiConnected = false;
-boolean masterConnected = false;
-
-///////////////////////////////////  DO NOT TOUCH UNDER THIS  ///////////////////////////////////////////////
-
-char Party = 'n';
-
-// UDP
-IPAddress Dest;
-unsigned int PORT = 8888;
-WiFiUDP UDP;
-int len;
-boolean udpConnected = false;
-char packetBuffer[8192]; // buffer to hold incoming packet,
-String str;
-
-// Timmer
-Ticker Time_Sec;
 
 ///////////////////////////////////////  Wifi function  ///////////////////////////////////////
 #pragma region "Wifi function"
@@ -103,129 +86,12 @@ boolean connectWifi()
     }
 #endif
 
-    // Save current IP as destination
-    Dest = WiFi.localIP();
-
-    // Change IP adresse to broadcast
-    Dest[3] = 255;
 
     return state;
 }
 
-
-/// @brief Create UDP server
-/// @return True if successful or False if not
-boolean connectUDP()
-{
-    boolean state = false;
-
-#ifdef LOG
-    Serial.println("");
-    Serial.println("Starting UDP server...");
-#endif
-
-    // Check if UDP is open
-    if (UDP.begin(PORT) == 1)
-    {
-        state = true;
-    }
-
-#ifdef LOG
-    if (state)
-    {
-        Serial.println("UDP running.");
-    }
-    else
-    {
-        Serial.println("Fail to open UDP server.");
-    }
-#endif
-
-    return state;
-}
-
-
-/// @brief Send broadcast to try to connect to server
-void BOTParam()
-{
-    comm.start("BOT;");
-    comm.add(NUMBER);
-
-    
-    #ifdef BTN_R 
-    comm.add(";BR");
-    #endif
-    #ifdef BTN_B
-    comm.add(";BB");
-    #endif
-    #ifdef BTN_O
-    comm.add(";BO");
-    #endif
-
-    #ifdef LED_R 
-    comm.add(";LR");
-    #endif
-    #ifdef LED_B
-    comm.add(";LB");
-    #endif
-
-    #ifdef Flash_R
-    comm.add(";FR");
-    #endif
-    #ifdef Flash_B
-    comm.add(";FB");
-    #endif
-    
-    #ifdef Buzzer
-    comm.add(";BUZ");
-    #endif
-    
-
-    #ifdef LCD
-    comm.add(";LCD");
-    #endif
-
-
-    comm.sendForced();
-}
-
-
-/// @brief Every seconde, try to reach server
-void T_1s()
-{
-
-    if (!masterConnected)
-    {
-        // Send start
-        BOTParam();
-    }
-}
-
-
-/// @brief Get current wifi level
-void WifiLevel()
-{
-
-#ifdef LOG
-    Serial.println("");
-    Serial.print("Wifi level : ");
-    Serial.println(WiFi.RSSI());
-#endif
-
-    char mystr[7];
-    sprintf(mystr, "%6d", WiFi.RSSI());
-
-    comm.start("LVL;");
-    comm.add(mystr);
-    comm.send();
-}
-
-#pragma endregion
-
-
-
-///////////////////////////////////////  Wifi function  ///////////////////////////////////////
-#pragma region "Wifi function"
+///////////////////////////////////////  Reset function  ///////////////////////////////////////
+#pragma region "Reset function"
 
 
 // Reset all proprety of module
@@ -264,9 +130,9 @@ void setup()
     Serial.begin(115200);
 #endif
 
+    // Starting LCD
     lcd.begin();
-
-    lcd.Write_Msg("Test", "Pierre", C_BLUE);
+    lcd.Write_Msg("Test", "Pierre", 'B');
 
     // Wait until wifi is connected
     do
@@ -274,11 +140,15 @@ void setup()
         wifiConnected = connectWifi();
     } while (wifiConnected == false);
 
-    // Create UDP server
-    udpConnected = connectUDP();
 
-    // Run timmer to try to connect Unity server
- //   Time_Sec.attach(1, T_1s);
+    comm.setID(3);
+
+    // Ajout des features selon #define
+    #ifdef LCD
+    comm.addFeature("LCD");
+    #endif
+
+    comm.begin(8888, 9999); // UDP port + TCP port
 
     // Put module in reset state
     ResetModule();
@@ -290,159 +160,41 @@ void setup()
 /// @brief asfdasfdsadf
 void loop()
 {
+    // Get message
+    comm.handle();
 
 #ifdef LOG
-    // Check if text is available on serial port
-    if (Serial.available() > 0)
-    {
-        // Read the received char
-        char inChar = (char)Serial.read();
-
-        // Check if it's an "Enter" char
-        if (inChar == '\n')
-        {
-            // Save received string, and test if valide
-            if (comm.ReceiveIntern(InputBuffer))
-            {
-                // Call received function
-                comm.callReceiveFunction();
-            }
-
-            // Clean received string buffer
-            InputBuffer.clear();
-        }
-        else
-        {
-            // Userfriendly: Show the current char writed
-            Serial.print(inChar);
-
-            // Sinon, ajoute le caractère entrant à la chaîne d'entrée
-            InputBuffer += inChar;
-        }
-    }
+    comm.handleSerialDebug();
 #endif
 
     // check if the WiFi and UDP connections were successful
-    if (wifiConnected and udpConnected)
+    if (wifiConnected)
     {
 
-        // if there’s data available, read a packet
-        int packetSize = UDP.parsePacket();
-        if (packetSize)
-        {
+        if (comm.hasNewCommand()) {
+            const char* cmd = comm.GetCode();
 
-            // read the packet into packetBufffer
-            int len = UDP.read(packetBuffer, packetSize);
+            
 
-            // and put a null char at the end of the string
-            if (len > 0)
+            #ifdef LCD
+            if (strcmp(cmd, "TXT") == 0 && comm.GetSize() >= 3) 
             {
-                packetBuffer[len] = 0;
-            }
-
-            // Test si message de réception du master
-
-            str = String(packetBuffer);
-
-            // Check if connection to Unity server is done
-            if (masterConnected)
+                lcd.Write_Msg(comm.GetParameter(0), comm.GetParameter(1), comm.GetParameter(2)[0]);
+                
+            } 
+            else if (strcmp(cmd, "POP") == 0 && comm.GetSize() >= 4) 
             {
-
-                // Parse received datas and check if it's for us
-                if (comm.Receive(str))
-                {
-
-                    // Convert code in string
-                    str = comm.GetCode();
-
-                    #ifdef LCD
-                    if ( str == "TXT")
-                    {
-                      lcd.Write_Msg(comm.GetParameter(1), comm.GetParameter(2), comm.GetParameter(3)[0]);
-                    }
-                    
-                    if ( str == "POP")
-                    {
-                        lcd.Write_Pop(comm.GetParameter(1), comm.GetParameter(2), comm.GetParameter(3)[0], comm.GetParameterInChar(4));
-                    }
-                    
-                    if ( str == "CLR")
-                    {
-                        lcd.SetColor(comm.GetParameter(1)[0]);
-                    }
-                    #endif
-                    
-                    // Server sak for BOT info
-                    if (str == "RBT")
-                    {
-                        BOTParam();
-                    }
-
-                    // Server ask for a reset of module
-                    else if (str == "RST")
-                    {
-                        ResetModule();
-                    }
-
-                    // Server ask for a PING request
-                    else if (str == "PIG")
-                    {
-                        comm.sendForced("POG");
-                    }
-
-                    // Return wifi quality
-                    else if (str == "LVL")
-                    {
-                        WifiLevel();
-                    }
-
-                    // But module in debug mode
-                    else if (str == "DBG")
-                    {
-                        switch (comm.GetParameter(1)[0])
-                        {
-                        case '0':
-                            debug = false;
-                            break;
-
-                        case '1':
-                            debug = true;
-                            break;
-
-                        case '?':
-                            if (debug)
-                                comm.send("DBG;1");
-                            else
-
-                                comm.send("DBG;0");
-                            break;
-                        }
-                    }
-                }
-            }
-            else
+                lcd.Write_Pop(comm.GetParameter(0), comm.GetParameter(1), comm.GetParameter(2)[0], comm.GetParameter(3));
+            } 
+            else if (strcmp(cmd, "CLR") == 0) 
             {
-                // If we are not connected to unity, we wait for a welcom message
-                if (str == "Y;BVN")
-                {
-                    // Timer
-                    Time_Sec.detach();
-
-                    masterConnected = true;
-                    Dest = UDP.remoteIP();
-
-                    comm.Started();
-
-#ifdef LOG
-                    Serial.println("");
-                    Serial.println("Connected to server : ");
-                    Serial.println(Dest);
-#endif
-                }
+                lcd.SetColor(comm.GetParameter(1)[0]);
             }
+            #endif
+
         }
 
-        delay(10);
     }
 
-}
+}                    
+

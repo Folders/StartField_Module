@@ -29,19 +29,18 @@ public:
 
     void Clear(char c[]);
 
-    void Write_Msg(String L1, String L2, char color);
+    void Write_Msg(const char* L1, const char* L2, const char color);
 
-    void Write_Pop(String L1, String L2, char color, char t[]);
+    void Write_Pop(const char* L1, const char* L2, const char color, const char* t);
 
-    
     void SetColor(char c);
 
 private:
 
     PA_LCD _lcd = PA_LCD();
 
-    char _backupLine1[16];
-    char _backupLine2[16];
+    char _backupLine1[17];
+    char _backupLine2[17];
     char _backupColor;
 
     bool _popup = false;

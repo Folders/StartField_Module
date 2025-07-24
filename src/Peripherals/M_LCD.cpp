@@ -7,67 +7,38 @@ void M_LCD::begin()
 	_lcd.begin(16, 2);
 }
 
-void M_LCD::Clear(char c[])
-{
-	char *ptr = c;
-	bool endChar = false;
-	// Remplire avec des espaces
-	for (uint8_t i = 0; i < 16; i++)
-	{
-		if (*ptr == NULL)
-		{
-			// Terminer le tableau
-			endChar = true;
-		}
-		if (endChar)
-		{
-			// Terminer le tableau
-			*ptr = ' ';
-		}
-		ptr++;
-	}
-}
 
-void M_LCD::Write_Msg(String L1, String L2, char color)
+void M_LCD::Write_Msg(const char* L1, const char* L2, const char color)
 {
 
-	// Effacer le texte
-	//Clear(L1);
-	//Clear(L2);
+    // Copier et remplir d'espaces
+    strncpy(_backupLine1, L1, 16);
+    strncpy(_backupLine2, L2, 16);
+    _backupLine1[16] = '\0';
+    _backupLine2[16] = '\0';
 
-	// Backup des valeures
-	//memcpy(_backupLine1, L1, 16);
-	//memcpy(_backupLine2, L2, 16);
+    // Compléter avec espaces
+    for (uint8_t i = strlen(_backupLine1); i < 16; i++) _backupLine1[i] = ' ';
+    for (uint8_t i = strlen(_backupLine2); i < 16; i++) _backupLine2[i] = ' ';
 
-	if (_popup)
+    // Écriture sur LCD
+    if (_popup) {
+        if (color && color != 'N') {
+            _backupColor = color;
+        }
+    } 
+	else 
 	{
-		// Chagement de la couleur
-		if (color)
-		{
-			if (color != 'N')
-			{
-				_backupColor = color;
-			}
-		}
-	}
-	else
-	{
-		// Ecrire le texte
-		_lcd.setCursor(0, 0);
-		_lcd.print(L1);
-		_lcd.setCursor(0, 1);
-		_lcd.print(L2);
+        _lcd.setCursor(0, 0);
+        _lcd.print(_backupLine1);
+        _lcd.setCursor(0, 1);
+        _lcd.print(_backupLine2);
 
-		// Chagement de la couleur
-		if (color)
-		{
-			if (color != 'N')
-			{
-				_backupColor = color;
-				SetColor(color);
-			}
-		}
-	}
+        if (color && color != 'N') {
+            _backupColor = color;
+            SetColor(color);
+        }
+    }
 
 #ifdef DEBUG
 	Serial.println("");
@@ -81,30 +52,35 @@ void M_LCD::Write_Msg(String L1, String L2, char color)
 #endif
 }
 
-void M_LCD::Write_Pop(String L1, String L2, char color, char t[])
+void M_LCD::Write_Pop(const char* L1, const char* L2, const char color, const char* t) 
 {
-	// Status popup
-	_popup = true;
+    _popup = true;
 
-	// Effacer le texte
-	//Clear(L1);
-	//Clear(L2);
+    // Créer des lignes de 16 caractères complètes
+    char line1[17];
+    char line2[17];
 
-	// Ecrire le texte
-	_lcd.setCursor(0, 0);
-	_lcd.print(L1);
-	_lcd.setCursor(0, 1);
-	_lcd.print(L2);
+    strncpy(line1, L1, 16);
+    strncpy(line2, L2, 16);
+    line1[16] = '\0';
+    line2[16] = '\0';
 
-	// Chagement de la couleur
-	if (color)
-	{
-		SetColor(color);
-	}
+    for (uint8_t i = strlen(line1); i < 16; i++) line1[i] = ' ';
+    for (uint8_t i = strlen(line2); i < 16; i++) line2[i] = ' ';
 
-	// Set timmer
-	_ticker.attach(CharToFloat(t), std::bind(&M_LCD::_endPopup, this));
-	
+    // Afficher le texte
+    _lcd.setCursor(0, 0);
+    _lcd.print(line1);
+    _lcd.setCursor(0, 1);
+    _lcd.print(line2);
+
+    // Couleur
+    if (color) {
+        SetColor(color);
+    }
+
+    // Timer pour fermer le popup
+    _ticker.attach(CharToFloat(t), std::bind(&M_LCD::_endPopup, this));
 
 #ifdef DEBUG
 	Serial.println("");
@@ -125,6 +101,7 @@ void M_LCD::_endPopup()
 {
 	// Status popup
 	_popup = false;
+	_ticker.detach();
 
 	// Ecrire le texte
 	_lcd.setCursor(0, 0);
@@ -144,11 +121,11 @@ void M_LCD::_endPopup()
 	Serial.println("");
 	Serial.println("Retour ancien texte sur LCD : ");
 	Serial.print("L1 : ");
-	Serial.println(Line1_backup);
+	Serial.println(_backupLine1);
 	Serial.print("L2 : ");
-	Serial.println(Line2_backup);
+	Serial.println(_backupLine2);
 	Serial.print("Color : ");
-	Serial.println(Color_backup);
+	Serial.println(_backupColor);
 #endif
 }
 
