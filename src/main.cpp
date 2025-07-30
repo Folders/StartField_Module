@@ -132,16 +132,35 @@ void setup()
 
     // Starting LCD
     lcd.begin();
-    lcd.Write_Msg("Test", "Pierre", 'B');
+    lcd.Write_Msg("Try to connect:", ssid, 'W');
 
     // Wait until wifi is connected
     do
     {
         wifiConnected = connectWifi();
     } while (wifiConnected == false);
+    
 
+    char line1[17];
+    char line2[17];
 
-    comm.setID(3);
+    // Remplir avec des espaces
+    memset(line1, ' ', 16);
+    memset(line2, ' ', 16);
+    line1[16] = '\0';
+    line2[16] = '\0';
+
+    // Ligne 1 : "Module n°X"
+    snprintf(line1, sizeof(line1), " - Module %03d - ", NUMBER);
+
+    // Ligne 2 : IP (WiFi.localIP())
+    IPAddress ip = WiFi.localIP();
+    snprintf(line2, sizeof(line2), "%d.%d.%d.%d", ip[0], ip[1], ip[2], ip[3]);
+
+    // Envoyer au LCD
+    lcd.Write_Msg(line1, line2, 'W');
+
+    comm.setID(NUMBER);
 
     // Ajout des features selon #define
     #ifdef LCD

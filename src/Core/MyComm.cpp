@@ -2,7 +2,7 @@
 #include "common.h"
 
 MyComm::MyComm()
-    : _deviceID(0), _featureCount(0), _udpPort(0), _tcpPort(0),
+    : _state(WAIT_BVN), _deviceID(0), _featureCount(0), _udpPort(0), _tcpPort(0),
       _paramCount(0), _newCommand(false), _lastHeartbeat(0), _lastTCPAttempt(0) {
     _bufferIn[0] = '\0';
     _bufferOut[0] = '\0';
@@ -66,6 +66,8 @@ void MyComm::_handleUDP() {
 }
 
 void MyComm::_handleTCP() {
+        
+
     if (_tcp.connected()) {
         while (_tcp.available()) {
             int len = _tcp.readBytesUntil('\n', _bufferIn, BUFFER_SIZE - 1);
@@ -76,8 +78,19 @@ void MyComm::_handleTCP() {
 #endif
             _processMessage(true);
         }
-    } else {
-        _reconnectTCP();
+    }  
+    else {
+        if (_state == READY_FOR_TCP) {
+            if (_tcp.connect(_serverIP, _tcpPort)) {
+                #ifdef LOG
+                Serial.println("[COMM] TCP connecté, envoi BVN handshake");
+                #endif
+                snprintf(_bufferOut, BUFFER_SIZE, "BVN;%u", _deviceID);
+                _tcp.print(_bufferOut);
+                _tcp.print("\n");
+                _state = TCP_CONNECTED;
+            }
+        }
     }
 }
 
@@ -134,6 +147,22 @@ void MyComm::_processMessage(bool fromTCP) {
         _params[_paramCount++] = token;
     }
 
+    
+    // ---- Gestion des commandes internes ----
+    if (strcmp(_code, "BVN") == 0) {
+        if (fromTCP) {
+            _state = TCP_CONNECTED;
+            #ifdef LOG
+            Serial.println("[COMM] TCP handshake confirmé (BVN reçu)");
+            #endif
+        } else {
+            _state = READY_FOR_TCP;
+            #ifdef LOG
+            Serial.println("[COMM] BVN reçu en UDP -> TCP READY");
+            #endif
+        }
+        return;
+    }
 
     if (strcmp(_code, "PIG") == 0) {
         _respond("POG", fromTCP);

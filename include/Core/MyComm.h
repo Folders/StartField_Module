@@ -45,6 +45,9 @@ private:
     WiFiUDP _udp;
     WiFiClient _tcp;
     IPAddress _serverIP;
+    
+    enum CommState { WAIT_BVN, READY_FOR_TCP, TCP_CONNECTED };
+    CommState _state;
 
     char _bufferIn[BUFFER_SIZE];
     char _bufferOut[BUFFER_SIZE];
