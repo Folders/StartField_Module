@@ -104,9 +104,11 @@ public:
   void command(uint8_t);
   
 //  uint8_t readButtons();
-  bool read(uint8_t buttonPin);
+  bool read(char color);
   void setRed(bool state);
   void setBlu(bool state);
+
+  void setLed(char color, bool state);
 
 
 private:

@@ -15,6 +15,16 @@
 M_LCD lcd;
 
 
+#include "Peripherals/M_Button.h"
+M_Button btnRed('R');
+M_Button btnBlu('B');
+M_Button btnOrg('O');
+
+#include "Peripherals/M_Flash.h"
+M_Flash flRed('R');
+M_Flash flBlu('B');
+
+
 ////////////////////////
 
 /// @brief Communication object
@@ -134,6 +144,15 @@ void setup()
     lcd.begin();
     lcd.Write_Msg("Try to connect:", ssid, 'W');
 
+    // Starting button
+    btnRed.begin(D3);
+    btnBlu.begin(D4);
+    btnOrg.begin(D5);
+
+    // Starting flash lamp
+    flRed.begin(D6);
+    flBlu.begin(D7);
+
     // Wait until wifi is connected
     do
     {
@@ -211,7 +230,43 @@ void loop()
             }
             #endif
 
+            // Check for led update
+            if (strcmp(cmd, "LED") == 0 && comm.GetSize() == 2) 
+            {
+                switch (comm.GetParameter(0)[0])
+                { 
+                    case 'R':    // Rouge
+                        btnRed.setLed(comm.GetParameter(1)[0]);
+                        break;
+                    
+                    case 'B':	// Blue
+                        btnBlu.setLed(comm.GetParameter(1)[0]);
+                        break;
+                    break;
+                }
+            } 
+
+            // Check for flash lamp update
+            if (strcmp(cmd, "FLH") == 0 && comm.GetSize() == 2) 
+            {
+                switch (comm.GetParameter(0)[0])
+                { 
+                    case 'R':    // Rouge
+                        flRed.setFlash(comm.GetParameter(1)[0]);
+                        break;
+                    
+                    case 'B':	// Blue
+                        flBlu.setFlash(comm.GetParameter(1)[0]);
+                        break;
+                    break;
+                }
+            }
+
         }
+
+        // Update button
+        btnBlu.readButton();
+        btnRed.readButton();
 
     }
 

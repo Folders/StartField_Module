@@ -123,6 +123,7 @@ void MyComm::send(const char* message) {
         Serial.print("Sending UDP: ");
     Serial.println(message);
 #endif
+
     if (_tcp.connected()) {
         _tcp.print(message);
         _tcp.print("\n");

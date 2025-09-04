@@ -15,7 +15,7 @@
 /////////////////////////////////   Define options of module   /////////////////////////////////
 
 // Define module number if more then one is used
-#define NUMBER 3
+#define NUMBER 2
 #define TERRAIN 'P'
 
 
@@ -61,9 +61,15 @@ int CharToInt(char *p);
 /// @return Value in float
 float CharToFloat(const char *p);
 
-
-
 /// @brief Send more information to the server
 extern bool debug;
+
+
+class MyComm;          // forward declaration
+extern MyComm comm;    // objet global fourni par main
+
+class M_LCD;
+extern M_LCD lcd;
+
 
 #endif // COMMON_FILE_H

@@ -431,11 +431,11 @@ void PA_LCD::write8bits(uint8_t value) {
   pulseEnable();
 }
 
-bool PA_LCD::read(uint8_t buttonPin) {
+bool PA_LCD::read(char color) {
 	
   // Checke si le module doit traiter le message
-  switch (buttonPin){ 
-    case 0:    // Rouge
+  switch (color){ 
+    case 'R':    // Rouge
       if (_i2c.digitalRead(1)){
         return true;
       }
@@ -444,7 +444,7 @@ bool PA_LCD::read(uint8_t buttonPin) {
       }
       break;
       
-    case 2:		// Bleu
+    case 'B':		// Bleu
       if (_i2c.digitalRead(2)){
         return true;
       }
@@ -453,7 +453,7 @@ bool PA_LCD::read(uint8_t buttonPin) {
       }
       break;
       
-    case 14:	// Orange
+    case 'O':	// Orange
       if (_i2c.digitalRead(0)){
         return true;
       }
@@ -467,14 +467,29 @@ bool PA_LCD::read(uint8_t buttonPin) {
  
 }
 
+
+// Allows to set the backlight, if the LCD backpack is used
+void PA_LCD::setLed(char color, bool state) {
+
+  switch (color){ 
+    case 'R':    // Rouge
+	    _i2c.digitalWrite(3, state);
+      break;
+      
+      
+    case 'B':	// Orange
+	    _i2c.digitalWrite(4, state);
+      break;
+  }  
+
+}
+
+
 // Allows to set the backlight, if the LCD backpack is used
 void PA_LCD::setRed(bool state) {
 
-  
     // Set i2c output
 	_i2c.digitalWrite(3, state);
-
-  
 }
 
 // Allows to set the backlight, if the LCD backpack is used
@@ -482,5 +497,4 @@ void PA_LCD::setBlu(bool state) {
   
 	// Set i2c output
 	_i2c.digitalWrite(4, state);
-  
 }
