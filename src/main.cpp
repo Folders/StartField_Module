@@ -24,6 +24,9 @@ M_Button btnOrg('O');
 M_Flash flRed('R');
 M_Flash flBlu('B');
 
+#include "Peripherals/M_Buzzer.h"
+M_Buzzer buzzer;
+
 
 ////////////////////////
 
@@ -153,6 +156,9 @@ void setup()
     flRed.begin(D6);
     flBlu.begin(D7);
 
+    // Start buzzer
+    buzzer.begin(D5);
+
     // Wait until wifi is connected
     do
     {
@@ -262,6 +268,10 @@ void loop()
                 }
             }
 
+            // Check for led update
+            if (strcmp(cmd, "BUZ") == 0 && comm.GetSize() == 1) 
+                buzzer.buzz(comm.GetParameter(0));
+
         }
 
         // Update button
@@ -270,5 +280,4 @@ void loop()
 
     }
 
-}                    
-
+}

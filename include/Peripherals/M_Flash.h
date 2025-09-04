@@ -1,7 +1,5 @@
 #pragma once
 #include <Arduino.h>
-#include <Ticker.h>
-#include <PA_LCD.h>
 
 /// @brief Classe représentant le module de type BASE
 class M_Flash {
