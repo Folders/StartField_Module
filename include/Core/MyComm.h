@@ -1,5 +1,4 @@
-#ifndef MYCOMM_H
-#define MYCOMM_H
+#pragma once
 
 #include "common.h"
 #include <Arduino.h>
@@ -67,5 +66,3 @@ private:
     void _reconnectTCP();
     void _respond(const char* msg, bool viaTCP);
 };
-
-#endif

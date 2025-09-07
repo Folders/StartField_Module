@@ -1,3 +1,5 @@
+#pragma once
+
 #define LCD
 
 #ifdef LCD
@@ -34,6 +36,13 @@ public:
     void Write_Pop(const char* L1, const char* L2, const char color, const char* t);
 
     void SetColor(char c);
+
+    bool AsPopup();
+
+    void setCursor(uint8_t col, uint8_t row);
+
+    void print(const char * text);
+    void print(int n);
 
 private:
 

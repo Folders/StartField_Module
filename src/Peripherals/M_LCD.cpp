@@ -163,3 +163,25 @@ void M_LCD::SetColor(char c)
 		break;
 	}
 }
+
+
+bool M_LCD::AsPopup()
+{
+	return _popup;
+}
+
+
+void M_LCD::setCursor(uint8_t col, uint8_t row)
+{
+	_lcd.setCursor(col, row);
+}
+
+void M_LCD::print(const char * text)
+{
+	_lcd.print(text);
+}
+
+void M_LCD::print(int n)
+{
+	_lcd.print(n);
+}

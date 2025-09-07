@@ -1,5 +1,4 @@
-#ifndef COMMON_FILE_H
-#define COMMON_FILE_H
+#pragma once
 
 #include <Arduino.h>
 #include <string>
@@ -15,13 +14,15 @@
 /////////////////////////////////   Define options of module   /////////////////////////////////
 
 // Define module number if more then one is used
-#define NUMBER 2
+#define NUMBER 3
 #define TERRAIN 'P'
 
 
 /////////////////////////////////   Define options of module   /////////////////////////////////
 
-/*
+#define BASE
+
+
 // LCD is used
 #define LCD
 
@@ -33,6 +34,7 @@
 #define LED_R
 #define LED_B
 
+/*
 // External materiel used
 #define Flash_R
 #define Flash_B
@@ -45,6 +47,12 @@
 #define OBJECTIVE
 
 */
+
+
+#include "Type/T_Base.h"
+
+
+extern char party;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 //                                          Function                                         //
@@ -70,6 +78,3 @@ extern MyComm comm;    // objet global fourni par main
 
 class M_LCD;
 extern M_LCD lcd;
-
-
-#endif // COMMON_FILE_H

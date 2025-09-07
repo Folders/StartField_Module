@@ -1,5 +1,4 @@
 #include "Core/MyComm.h"
-#include "common.h"
 
 MyComm::MyComm()
     : _state(WAIT_BVN), _deviceID(0), _featureCount(0), _udpPort(0), _tcpPort(0),

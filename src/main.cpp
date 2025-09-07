@@ -1,5 +1,6 @@
+#include "common.h"
+
 #include <Arduino.h>
-#include <common.h>
 
 // Basic needed library
 #ifdef ESP8266
@@ -9,11 +10,11 @@
 #endif
 
 #include "core/MyComm.h"
-
+/// @brief Communication objectPourquo
+MyComm comm;
 
 #include "Peripherals/M_LCD.h"
 M_LCD lcd;
-
 
 #include "Peripherals/M_Button.h"
 M_Button btnRed('R');
@@ -30,15 +31,14 @@ M_Buzzer buzzer;
 
 ////////////////////////
 
-/// @brief Communication object
-MyComm comm;
+char party = 'n';
 
 /// @brief Serial input string buffer
 String InputBuffer;
 
 /// @brief Send more information to the server
 bool debug = false;
-//bool debug = true;
+
 
 // Wifi
 #include <secret.h>
@@ -123,11 +123,11 @@ void ResetModule()
 
 
   #ifdef BTN_R
-  SetLed('R', '0');
+  btnRed.setLed('0');
   #endif
 
   #ifdef BTN_B
-  SetLed('B', '0');
+  btnBlu.setLed('0');
   #endif
 }
 
@@ -191,7 +191,21 @@ void setup()
     #ifdef LCD
     comm.addFeature("LCD");
     #endif
-
+    #ifdef BTN_R
+    comm.addFeature("BR");
+    #endif
+    #ifdef BTN_B
+    comm.addFeature("BB");
+    #endif
+    #ifdef BTN_O
+    comm.addFeature("BO");
+    #endif
+    #ifdef LED_R
+    comm.addFeature("LR");
+    #endif
+    #ifdef LED_B
+    comm.addFeature("LB");
+    #endif    
     comm.begin(8888, 9999); // UDP port + TCP port
 
     // Put module in reset state
@@ -271,6 +285,27 @@ void loop()
             // Check for led update
             if (strcmp(cmd, "BUZ") == 0 && comm.GetSize() == 1) 
                 buzzer.buzz(comm.GetParameter(0));
+
+                
+            #ifdef BASE
+            // Paramètres de la base    "Id;Team;Type;Spawn"
+            if (strcmp(cmd, "PST") == 0 && comm.GetSize() == 4)
+            {
+                SetBase(comm.GetParameter(0)[0],comm.GetParameter(1)[0], comm.GetParameter(2)[0], comm.GetParameter(3)[0]);
+            }
+
+            // Set timer for respawn
+            if (strcmp(cmd, "STM") == 0 && comm.GetSize() == 2)
+            {
+                SetBaseTime(comm.GetParameter(0), comm.GetParameter(1));
+            }
+
+            // Reset timer for respawn
+            if (strcmp(cmd, "RTM") == 0 && comm.GetSize() == 0)
+            {
+                ResetBaseTime();
+            }
+            #endif 
 
         }
 
