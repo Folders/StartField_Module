@@ -232,7 +232,21 @@ void loop()
         if (comm.hasNewCommand()) {
             const char* cmd = comm.GetCode();
 
-            
+            #ifdef LOG
+            Serial.println("");
+            Serial.print("Command : ");
+            Serial.println(comm.GetCode());
+            Serial.print("Param 1 : ");
+            Serial.println(comm.GetParameter(0));
+            Serial.print("Param 2 : ");
+            Serial.println(comm.GetParameter(1));
+            Serial.print("Param 3 : ");
+            Serial.println(comm.GetParameter(2));
+            Serial.print("Param 4 : ");
+            Serial.println(comm.GetParameter(3));
+            Serial.print("Param 5 : ");
+            Serial.println(comm.GetParameter(4));
+            #endif
 
             #ifdef LCD
             if (strcmp(cmd, "TXT") == 0 && comm.GetSize() >= 3) 

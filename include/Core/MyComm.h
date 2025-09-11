@@ -59,8 +59,17 @@ private:
     const unsigned long _heartbeatInterval = 1000; // 1s
     unsigned long _lastTCPAttempt;
 
+    static constexpr uint8_t MAX_QUEUE = 10;
+    static constexpr uint8_t MAX_CMD_LEN = 64;
+
+    char _commandQueue[MAX_QUEUE][MAX_CMD_LEN];
+    uint8_t _queueStart = 0;
+    uint8_t _queueEnd = 0;
+
+
     void _sendBOT();
     void _processMessage(bool fromTCP);
+    void _processSingleCommand(char* msg);
     void _handleUDP();
     void _handleTCP();
     void _reconnectTCP();

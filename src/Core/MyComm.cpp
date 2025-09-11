@@ -47,6 +47,19 @@ void MyComm::handle() {
 
     _handleUDP();
     _handleTCP();
+
+    
+    if (_queueStart != _queueEnd) {
+        const char* cmd = _commandQueue[_queueStart];
+        _queueStart = (_queueStart + 1) % MAX_QUEUE;
+
+#ifdef LOG
+        Serial.print("Command : ");
+        Serial.println(cmd);
+#endif
+
+        _processSingleCommand((char*)cmd);  // ou false si nécessaire
+    }
 }
 
 void MyComm::_handleUDP() {
@@ -76,6 +89,7 @@ void MyComm::_handleTCP() {
             Serial.println(_bufferIn);
 #endif
             _processMessage(true);
+            break; // ou return; pour sortir
         }
     }  
     else {
@@ -84,13 +98,85 @@ void MyComm::_handleTCP() {
                 #ifdef LOG
                 Serial.println("[COMM] TCP connecté, envoi BVN handshake");
                 #endif
-                snprintf(_bufferOut, BUFFER_SIZE, "BVN;%u", _deviceID);
+                snprintf(_bufferOut, BUFFER_SIZE, "BVN;%u\n", _deviceID);
                 _tcp.print(_bufferOut);
-                _tcp.print("\n");
                 _state = TCP_CONNECTED;
             }
         }
     }
+}
+
+/// @brief Separate commands if a message contain more than one
+/// @param fromTCP 
+void MyComm::_processMessage(bool fromTCP) {
+    char* line = strtok(_bufferIn, "\n");
+    while (line != nullptr) {
+
+        // 1. Vérifie que la ligne est assez longue
+        if (strlen(line) >= 3) {
+
+            // 2. Extraire les 3 premiers caractères (code)
+            char cmd[4];
+            strncpy(cmd, line, 3);
+            cmd[3] = '\0';
+
+            // 3. Tester les commandes internes
+            if (strcmp(cmd, "PIG") == 0) {
+                _respond("POG", fromTCP);
+            }
+            else if (strcmp(cmd, "LVL") == 0) {
+                char resp[32];
+                snprintf(resp, sizeof(resp), "LVL;%d", WiFi.RSSI());
+                _respond(resp, fromTCP);
+            }
+            else if (strcmp(cmd, "RBT") == 0) {
+                _sendBOT();
+            }
+            else if (strcmp(cmd, "BVN") == 0) {
+                _state = fromTCP ? TCP_CONNECTED : READY_FOR_TCP;
+#ifdef LOG
+                Serial.println(fromTCP ? "[COMM] TCP handshake confirmé (BVN reçu)"
+                                       : "[COMM] BVN reçu en UDP → TCP READY");
+#endif
+            }
+            else {
+                // 4. Sinon, empile la ligne dans la queue circulaire
+                uint8_t next = (_queueEnd + 1) % MAX_QUEUE;
+                if (next != _queueStart) {
+                    strncpy(_commandQueue[_queueEnd], line, MAX_CMD_LEN - 1);
+                    _commandQueue[_queueEnd][MAX_CMD_LEN - 1] = '\0';
+                    _queueEnd = next;
+                    _newCommand = true;
+                }
+#ifdef LOG
+                else {
+                    Serial.println("[COMM] ⚠ File de commandes pleine, commande ignorée");
+                }
+#endif
+            }
+        }
+
+        // Ligne suivante
+        line = strtok(nullptr, "\n");
+    }
+}
+
+
+void MyComm::_processSingleCommand(char* msg) {
+    char* token = strtok(_bufferIn, ";");
+    if (!token) return;
+
+    // Sauvegarde du code
+    strncpy(_code, token, sizeof(_code) - 1);
+    _code[sizeof(_code) - 1] = '\0';
+
+    // Récupérer les paramètres
+    _paramCount = 0;
+    while ((token = strtok(NULL, ";")) && _paramCount < MAX_PARAMS) {
+        _params[_paramCount++] = token;
+    }
+
+    _newCommand = true;
 }
 
 void MyComm::_reconnectTCP() {
@@ -111,7 +197,11 @@ void MyComm::_sendBOT() {
         strncat(_bufferOut, ";", BUFFER_SIZE - strlen(_bufferOut) - 1);
         strncat(_bufferOut, _features[i], BUFFER_SIZE - strlen(_bufferOut) - 1);
     }
-    send(_bufferOut);
+    
+    // Send boot info only in UDP
+    _udp.beginPacket(_serverIP ? _serverIP : IPAddress(255,255,255,255), _udpPort);
+    _udp.write(_bufferOut);
+    _udp.endPacket();
 }
 
 void MyComm::send(const char* message) {
@@ -131,55 +221,6 @@ void MyComm::send(const char* message) {
         _udp.write(message);
         _udp.endPacket();
     }
-}
-
-void MyComm::_processMessage(bool fromTCP) {
-    char* token = strtok(_bufferIn, ";");
-    if (!token) return;
-
-    // Sauvegarde du code
-    strncpy(_code, token, sizeof(_code) - 1);
-    _code[sizeof(_code) - 1] = '\0';
-
-    // Récupérer les paramètres
-    _paramCount = 0;
-    while ((token = strtok(NULL, ";")) && _paramCount < MAX_PARAMS) {
-        _params[_paramCount++] = token;
-    }
-
-    
-    // ---- Gestion des commandes internes ----
-    if (strcmp(_code, "BVN") == 0) {
-        if (fromTCP) {
-            _state = TCP_CONNECTED;
-            #ifdef LOG
-            Serial.println("[COMM] TCP handshake confirmé (BVN reçu)");
-            #endif
-        } else {
-            _state = READY_FOR_TCP;
-            #ifdef LOG
-            Serial.println("[COMM] BVN reçu en UDP -> TCP READY");
-            #endif
-        }
-        return;
-    }
-
-    if (strcmp(_code, "PIG") == 0) {
-        _respond("POG", fromTCP);
-        return;
-    }
-    if (strcmp(_code, "LVL") == 0) {
-        char resp[32];
-        snprintf(resp, sizeof(resp), "LVL;%d", WiFi.RSSI());
-        _respond(resp, fromTCP);
-        return;
-    }
-    if (strcmp(_code, "RBT") == 0) {
-        _sendBOT();
-        return;
-    }
-
-    _newCommand = true;
 }
 
 void MyComm::_respond(const char* msg, bool viaTCP) {

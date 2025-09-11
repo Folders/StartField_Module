@@ -14,7 +14,7 @@
 /////////////////////////////////   Define options of module   /////////////////////////////////
 
 // Define module number if more then one is used
-#define NUMBER 3
+#define NUMBER 10
 #define TERRAIN 'P'
 
 
