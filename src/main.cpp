@@ -300,7 +300,7 @@ void loop()
             if (strcmp(cmd, "BUZ") == 0 && comm.GetSize() == 1) 
                 buzzer.buzz(comm.GetParameter(0));
 
-                
+
             #ifdef BASE
             // Paramètres de la base    "Id;Team;Type;Spawn"
             if (strcmp(cmd, "PST") == 0 && comm.GetSize() == 4)
@@ -318,6 +318,14 @@ void loop()
             if (strcmp(cmd, "RTM") == 0 && comm.GetSize() == 0)
             {
                 ResetBaseTime();
+            }
+            #endif 
+
+            #ifdef SAFE
+            // Paramètres de la base    "Id;Team;Type;Spawn"
+            if (strcmp(cmd, "PSZ") == 0 && comm.GetSize() == 1)
+            {
+                SetSafe(comm.GetParameter(0)[0]);
             }
             #endif 
 

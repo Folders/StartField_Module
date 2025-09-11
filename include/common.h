@@ -14,13 +14,14 @@
 /////////////////////////////////   Define options of module   /////////////////////////////////
 
 // Define module number if more then one is used
-#define NUMBER 10
+#define NUMBER 1
 #define TERRAIN 'P'
 
 
 /////////////////////////////////   Define options of module   /////////////////////////////////
 
 #define BASE
+#define SAFE
 
 
 // LCD is used
@@ -50,6 +51,7 @@
 
 
 #include "Type/T_Base.h"
+#include "Type/T_Safe.h"
 
 
 extern char party;
