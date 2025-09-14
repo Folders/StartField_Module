@@ -185,3 +185,14 @@ void M_LCD::print(int n)
 {
 	_lcd.print(n);
 }
+
+
+void M_LCD::createChar(uint8_t ind, uint8_t charmap[])
+{
+	_lcd.createChar(ind, charmap);
+}
+
+void M_LCD::write(uint8_t value)
+{
+	_lcd.write(byte(value));
+}

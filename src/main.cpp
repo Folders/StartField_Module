@@ -208,6 +208,11 @@ void setup()
     #endif    
     comm.begin(8888, 9999); // UDP port + TCP port
 
+
+    #ifdef FLAG 
+    InitFlag();
+    #endif
+
     // Put module in reset state
     ResetModule();
 }
@@ -321,13 +326,31 @@ void loop()
             }
             #endif 
 
+
             #ifdef SAFE
+        
             // Paramètres de la base    "Id;Team;Type;Spawn"
             if (strcmp(cmd, "PSZ") == 0 && comm.GetSize() == 1)
             {
                 SetSafe(comm.GetParameter(0)[0]);
             }
             #endif 
+
+            
+            #ifdef FLAG
+
+            // Set timer for respawn
+            if (strcmp(cmd, "PFG") == 0 && comm.GetSize() == 3)
+            {
+                SetFlag(comm.GetParameter(0)[0], comm.GetParameter(1)[0]);
+            }
+
+            // Reset timer for respawn
+            if (strcmp(cmd, "FLG") == 0 && comm.GetSize() == 1)
+            {
+                MoveFlag(comm.GetParameter(0)[0]);
+            }
+            #endif
 
         }
 

@@ -22,7 +22,8 @@
 
 #define BASE
 #define SAFE
-
+#define FLAG
+//#define BOMB
 
 // LCD is used
 #define LCD
@@ -52,6 +53,8 @@
 
 #include "Type/T_Base.h"
 #include "Type/T_Safe.h"
+#include "Type/T_Flag.h"
+#include "Type/T_Bomb.h"
 
 
 extern char party;

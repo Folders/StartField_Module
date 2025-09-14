@@ -30,7 +30,7 @@ void SetBase(char Id, char Team, char Type, char Spawn)
     Serial.println(Spawn);
     #endif
 
-    // Confirmation de la réception de paramètres
+    // Send status of parameter receive
     char msg[] = "PST;X";   // 8 octets, indices 0..7 + '\0'
     msg[4] = Id;           // remplace X
     comm.send(msg);

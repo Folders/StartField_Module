@@ -44,6 +44,10 @@ public:
     void print(const char * text);
     void print(int n);
 
+    void createChar(uint8_t ind, uint8_t charmap[]);
+
+    void write(uint8_t value);
+
 private:
 
     PA_LCD _lcd = PA_LCD();
