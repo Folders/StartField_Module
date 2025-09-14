@@ -31,7 +31,6 @@ int _PosFlag = 0;
 //          'N' Set flag to no team
 void SetFlag(char Id, char c)
 {
-
     // Save party Id
     party = Id;
 
@@ -377,4 +376,15 @@ void takeFREE()
     comm.send("SFG;N;T");
 }
 
+
+void ResetFlag()
+{
+    // Lock update of time
+    _moveToBLU = false;
+    _moveToRED = false;
+    _moveToNeutre = false;
+
+    // Lock update of time
+    _tickFlag.detach();
+}
 #endif

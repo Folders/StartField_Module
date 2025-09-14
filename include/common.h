@@ -23,7 +23,7 @@
 #define BASE
 #define SAFE
 #define FLAG
-//#define BOMB
+#define BOMB
 
 // LCD is used
 #define LCD

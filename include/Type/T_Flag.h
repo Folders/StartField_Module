@@ -12,6 +12,7 @@ void InitFlag();
 
 void SetFlag(char Id, char c);
 void MoveFlag(char c);
+void ResetFlag();
 
 void takeRED();
 void takeBLU();

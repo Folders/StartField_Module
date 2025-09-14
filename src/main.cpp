@@ -118,9 +118,10 @@ void ResetModule()
   // Reset timer of respawn
   //ResetBaseTime();
 
+  ResetFlag();
+  
   // Reset timer of bomb
-  //ResetBomb();
-
+  ResetBomb();
 
   #ifdef BTN_R
   btnRed.setLed('0');
@@ -211,6 +212,10 @@ void setup()
 
     #ifdef FLAG 
     InitFlag();
+    #endif
+
+    #ifdef BOMB 
+    InitBomb();
     #endif
 
     // Put module in reset state
@@ -349,6 +354,47 @@ void loop()
             if (strcmp(cmd, "FLG") == 0 && comm.GetSize() == 1)
             {
                 MoveFlag(comm.GetParameter(0)[0]);
+            }
+            #endif
+
+
+
+            #ifdef BOMB 
+               
+            // Init flag to a team
+            if (strcmp(cmd, "PBO") == 0 && comm.GetSize() == 3)
+            {
+                SetBomb(comm.GetParameter(0)[0], comm.GetParameter(1)[0], comm.GetParameter(2));
+            }
+
+            // Set password
+            if (strcmp(cmd, "PSW") == 0 && comm.GetSize() == 1)
+            {
+                SetPassword(comm.GetParameter(0));
+            }
+            
+            // Start bomb
+            if (strcmp(cmd, "BST") == 0 && comm.GetSize() == 3)
+            {
+                BombPlanted(comm.GetParameter(0), comm.GetParameter(1), comm.GetParameter(2));
+            }
+            
+            // Set defuse code
+            if (strcmp(cmd, "DIF") == 0 && comm.GetSize() == 1)
+            {
+              SetDefuse(comm.GetParameter(0));
+            }
+            
+            // Set defuse code
+            if (strcmp(cmd, "BRS") == 0 && comm.GetSize() == 0)
+            {
+              ResetDefuse();
+            }
+            
+            // Set defuse code
+            if (strcmp(cmd, "BED") == 0 && comm.GetSize() == 0)
+            {
+              ResetBomb();
             }
             #endif
 
