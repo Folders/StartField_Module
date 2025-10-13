@@ -155,6 +155,9 @@ void setup()
     // Start buzzer
     buzzer.begin(D5);
 
+    // Disabled sleep mode
+    WiFi.setSleep(false); 
+
     // Wait until wifi is connected
     do
     {
@@ -170,8 +173,18 @@ void setup()
     line1[16] = '\0';
     line2[16] = '\0';
 
+     // Get module ID
+    MyConfig::begin();
+    uint16_t gModuleId = MyConfig::getModuleId(); // 0 si non provisionné
+    comm.setID(gModuleId);
+    #ifdef LOG
+        Serial.println("");
+        Serial.print("Read ID : ");
+        Serial.println(gModuleId);
+    #endif
+
     // Ligne 1 : "Module n°X"
-    snprintf(line1, sizeof(line1), " - Module %03d - ", NUMBER);
+    snprintf(line1, sizeof(line1), " - Module %03d - ", gModuleId);
 
     // Ligne 2 : IP (WiFi.localIP())
     IPAddress ip = WiFi.localIP();
@@ -180,15 +193,7 @@ void setup()
     // Envoyer au LCD
     lcd.Write_Msg(line1, line2, 'W');
 
-    // Get module ID
-    MyConfig::begin();
-    uint16_t gModuleId = MyConfig::getModuleId(); // 0 si non provisionné
-    comm.setID(gModuleId);
-#ifdef LOG
-    Serial.println("");
-    Serial.print("Read ID : ");
-    Serial.println(gModuleId);
-#endif
+
 
 // Ajout des features selon #define
 #ifdef LCD
@@ -428,4 +433,6 @@ void loop()
         btnBlu.readButton();
         btnRed.readButton();
     }
+
+    yield(); // ou delay(0);
 }

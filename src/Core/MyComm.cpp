@@ -98,6 +98,8 @@ void MyComm::_handleTCP() {
                 #ifdef LOG
                 Serial.println("[COMM] TCP connecté, envoi BVN handshake");
                 #endif
+                _tcp.setNoDelay(true);
+                
                 snprintf(_bufferOut, BUFFER_SIZE, "BVN;%u\n", _deviceID);
                 _tcp.print(_bufferOut);
                 _state = TCP_CONNECTED;
@@ -204,29 +206,27 @@ void MyComm::_sendBOT() {
     _udp.endPacket();
 }
 
-void MyComm::send(const char* message) {
+void MyComm::send(const char* msg) {
 #ifdef LOG
     if (_tcp.connected()) 
         Serial.print("Sending TCP: ");
     else
         Serial.print("Sending UDP: ");
-    Serial.println(message);
+    Serial.println(msg);
 #endif
 
     if (_tcp.connected()) {
-        _tcp.print(message);
-        _tcp.print("\n");
+        _tcp.printf("%s\n", msg);  
     } else {
         _udp.beginPacket(_serverIP ? _serverIP : IPAddress(255,255,255,255), _udpPort);
-        _udp.write(message);
+        _udp.write(msg);
         _udp.endPacket();
     }
 }
 
 void MyComm::_respond(const char* msg, bool viaTCP) {
     if (viaTCP && _tcp.connected()) {
-        _tcp.print(msg);
-        _tcp.print("\n");
+        _tcp.printf("%s\n", msg);  
     } else {
         _udp.beginPacket(_serverIP, _udpPort);
         _udp.write(msg);
