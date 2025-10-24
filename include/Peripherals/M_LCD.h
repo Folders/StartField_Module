@@ -33,7 +33,7 @@ public:
 
     void Write_Msg(const char* L1, const char* L2, const char color);
 
-    void Write_Pop(const char* L1, const char* L2, const char color, const char* t);
+    void Write_Pop(const char* L1, const char* L2, const char color, const char* t); 
 
     void SetColor(char c);
 

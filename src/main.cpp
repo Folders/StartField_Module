@@ -22,13 +22,17 @@ M_Button btnRed('R');
 M_Button btnBlu('B');
 M_Button btnOrg('O');
 
-#include "Peripherals/M_Flash.h"
-M_Flash flRed('R');
-M_Flash flBlu('B');
 
-#include "Peripherals/M_Buzzer.h"
-M_Buzzer buzzer;
+#ifdef FLASH
+    #include "Peripherals/M_Flash.h"
+    M_Flash flRed('R');
+    M_Flash flBlu('B');
+#endif
 
+#ifdef BUZZER
+    #include "Peripherals/M_Buzzer.h"
+    M_Buzzer buzzer;
+#endif
 ////////////////////////
 
 char party = 'n';
@@ -148,12 +152,16 @@ void setup()
     btnBlu.begin(D4);
     btnOrg.begin(D5);
 
+#ifdef FLASH
     // Starting flash lamp
     flRed.begin(D6);
     flBlu.begin(D7);
+#endif
 
+#ifdef BUZZER
     // Start buzzer
     buzzer.begin(D5);
+#endif
 
     // Disabled sleep mode
     WiFi.setSleep(false); 
@@ -214,7 +222,14 @@ void setup()
 #ifdef LED_B
     comm.addFeature("LB");
 #endif
-    comm.begin(8888, 9999); // UDP port + TCP port
+#ifdef FLASH
+    comm.addFeature("FR");
+    comm.addFeature("FB");
+#endif
+#ifdef BUZZER
+    comm.addFeature("BUZ");
+#endif
+    comm.begin(8800, 8810); // UDP port + TCP port
 
 #ifdef FLAG
     InitFlag();
@@ -295,6 +310,7 @@ void loop()
                 }
             }
 
+#ifdef FLASH
             // Check for flash lamp update
             if (strcmp(cmd, "FLH") == 0 && comm.GetSize() == 2)
             {
@@ -310,11 +326,13 @@ void loop()
                     break;
                 }
             }
+#endif
 
+#ifdef BUZZER
             // Check for led update
             if (strcmp(cmd, "BUZ") == 0 && comm.GetSize() == 1)
                 buzzer.buzz(comm.GetParameter(0));
-
+#endif
             // Check for led update
             if (strcmp(cmd, "SID") == 0 && comm.GetSize() == 1)
             {

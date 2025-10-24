@@ -20,11 +20,6 @@
 
 /////////////////////////////////   Define options of module   /////////////////////////////////
 
-#define BASE
-#define SAFE
-#define FLAG
-#define BOMB
-
 // LCD is used
 #define LCD
 
@@ -36,19 +31,16 @@
 #define LED_R
 #define LED_B
 
-/*
+
 // External materiel used
-#define Flash_R
-#define Flash_B
-#define Buzzer
+#define FLASH
+#define BUZZER
 
 // Party mode used
 #define BASE
+#define SAFE
 #define FLAG
 #define BOMB
-#define OBJECTIVE
-
-*/
 
 
 #include "Type/T_Base.h"
