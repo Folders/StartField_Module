@@ -21,7 +21,7 @@ public:
 
     void setID(uint8_t id);
     void addFeature(const char* feature);
-    void begin(uint16_t udpPort, uint16_t tcpPort);
+    void begin(uint16_t udpPort);
     void handle();
     void send(const char* message);
 
@@ -39,21 +39,18 @@ private:
     char _features[MAX_FEATURES][8];
     uint8_t _featureCount;
     uint16_t _udpPort;
-    uint16_t _tcpPort;
 
     WiFiUDP _udp;
-    WiFiClient _tcp;
     IPAddress _serverIP;
-    
-    enum CommState { WAIT_BVN, READY_FOR_TCP, TCP_CONNECTED };
-    CommState _state;
 
     char _bufferIn[BUFFER_SIZE];
     char _bufferOut[BUFFER_SIZE];
     char _code[8];
+    char _messageId[8];
     char* _params[MAX_PARAMS];
     uint8_t _paramCount;
 
+    bool _connected;
     bool _newCommand;
     unsigned long _lastHeartbeat;
     const unsigned long _heartbeatInterval = 1000; // 1s
@@ -62,16 +59,20 @@ private:
     static constexpr uint8_t MAX_QUEUE = 10;
     static constexpr uint8_t MAX_CMD_LEN = 64;
 
+    // Buffer datas
     char _commandQueue[MAX_QUEUE][MAX_CMD_LEN];
     uint8_t _queueStart = 0;
     uint8_t _queueEnd = 0;
+    // ... with and persistant queue
+    char _rxFrameBuffer[BUFFER_SIZE];
+    uint16_t _rxFrameLen = 0;
 
+
+    void _handleUDP();
+    void _queueMessage();
 
     void _sendBOT();
-    void _processMessage(bool fromTCP);
-    void _processSingleCommand(char* msg);
-    void _handleUDP();
-    void _handleTCP();
-    void _reconnectTCP();
-    void _respond(const char* msg, bool viaTCP);
+    void _processMessage(char* msg);
+    void _sendRaw(const char* payload, bool forceBroadcast, const char* messageId);
+    void _sendACK();
 };

@@ -229,7 +229,7 @@ void setup()
 #ifdef BUZZER
     comm.addFeature("BUZ");
 #endif
-    comm.begin(8800, 8810); // UDP port + TCP port
+    comm.begin(8989); // UDP port + TCP port
 
 #ifdef FLAG
     InitFlag();

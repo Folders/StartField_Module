@@ -22,9 +22,9 @@ void M_Button::begin(uint8_t buttonPin)
 	_backup = _state;
 
     #ifdef DEBUG
-	Serial.println("");
-	Serial.print("Started button ");
-	Serial.println(_color);
+	Serial.print("Button ");
+	Serial.print(_color);
+	Serial.println(": Started");
     #endif
 }
 
@@ -33,7 +33,6 @@ void M_Button::readButton(void){
 
 
 	_state = _lcd.read(_color);
-
     
 	if(_backup != _state)
 	{
