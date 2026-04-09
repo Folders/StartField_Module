@@ -143,6 +143,10 @@ void MyComm::_processMessage(char* msg) {
     strncpy(_code, token, sizeof(_code) - 1);
     _code[sizeof(_code) - 1] = '\0';
 
+    // Avoid to broadcast BOT message to all modules
+    if (strcmp(_code, "BOT") == 0) return;
+
+
     // Reset args count for every new message
     _paramCount = 0;
 
